@@ -19,7 +19,6 @@ No modules.
 The following resources are used by this module:
 
 - [helm_release.eck_operator](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) (resource)
-- [helm_release.eck_operator_crds](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) (resource)
 
 ## Required Inputs
 
@@ -43,14 +42,6 @@ Type: `string`
 
 Default: `"3.1.0"`
 
-### <a name="input_eck_operator_crds_release_name"></a> [eck\_operator\_crds\_release\_name](#input\_eck\_operator\_crds\_release\_name)
-
-Description: The name of the Helm release for the ECK operator CRDs.
-
-Type: `string`
-
-Default: `"eck-operator-crds"`
-
 ### <a name="input_eck_operator_release_name"></a> [eck\_operator\_release\_name](#input\_eck\_operator\_release\_name)
 
 Description: The name of the Helm release for the ECK operator.
@@ -58,6 +49,18 @@ Description: The name of the Helm release for the ECK operator.
 Type: `string`
 
 Default: `"eck-operator"`
+
+### <a name="input_install_crds"></a> [install\_crds](#input\_install\_crds)
+
+Description:       installCRDs determines whether Custom Resource Definitions (CRD) are installed by the chart.  
+      Note that CRDs are global resources and require cluster admin privileges to install.  
+      If you are sharing a cluster with other users who may want to install ECK on their own namespaces, setting this to true can have unintended consequences.  
+      1. Upgrades will overwrite the global CRDs and could disrupt the other users of ECK who may be running a different version.  
+      2. Uninstalling the chart will delete the CRDs and potentially cause Elastic resources deployed by other users to be removed as well.
+
+Type: `bool`
+
+Default: `true`
 
 ## Outputs
 
