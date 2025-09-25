@@ -15,7 +15,7 @@ variable "eck_deploy_namespace" {
   description = "The Kubernetes namespace where the ECK operator will be deployed."
 }
 
-variable "eck_operator_crd_release_name" {
+variable "eck_operator_crds_release_name" {
   type        = string
   description = "The name of the Helm release for the ECK operator CRDs."
   default     = "eck-operator-crds"

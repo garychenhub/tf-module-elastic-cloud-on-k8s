@@ -19,7 +19,7 @@ No modules.
 The following resources are used by this module:
 
 - [helm_release.eck_operator](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) (resource)
-- [helm_release.eck_operator_crd](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) (resource)
+- [helm_release.eck_operator_crds](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) (resource)
 
 ## Required Inputs
 
@@ -43,7 +43,7 @@ Type: `string`
 
 Default: `"3.1.0"`
 
-### <a name="input_eck_operator_crd_release_name"></a> [eck\_operator\_crd\_release\_name](#input\_eck\_operator\_crd\_release\_name)
+### <a name="input_eck_operator_crds_release_name"></a> [eck\_operator\_crds\_release\_name](#input\_eck\_operator\_crds\_release\_name)
 
 Description: The name of the Helm release for the ECK operator CRDs.
 
