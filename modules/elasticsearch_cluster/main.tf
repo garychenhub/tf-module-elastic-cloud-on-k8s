@@ -3,6 +3,7 @@ resource "kubernetes_manifest" "es_cluster" {
     {
       es_cluster_name = var.es_cluster_name
       es_version      = var.es_version
+      namespace       = var.namespace
     }
   ))
 }

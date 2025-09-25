@@ -2,6 +2,7 @@ apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
   name: ${es_cluster_name}
+  namespace: ${namespace}
 spec:
   version: ${es_version}
   nodeSets:
