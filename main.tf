@@ -18,4 +18,6 @@ resource "helm_release" "eck_operator_crd" {
   repository = local.eck_chart_repository
   version    = var.chart_version
   namespace  = var.eck_deploy_namespace
+
+  depends_on = [helm_release.eck_operator]
 }
