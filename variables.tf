@@ -15,8 +15,14 @@ variable "eck_deploy_namespace" {
   description = "The Kubernetes namespace where the ECK operator will be deployed."
 }
 
-variable "eck_operator_crds_release_name" {
-  type        = string
-  description = "The name of the Helm release for the ECK operator CRDs."
-  default     = "eck-operator-crds"
+variable "install_crds" {
+  type        = bool
+  description = <<EOF
+      installCRDs determines whether Custom Resource Definitions (CRD) are installed by the chart.
+      Note that CRDs are global resources and require cluster admin privileges to install.
+      If you are sharing a cluster with other users who may want to install ECK on their own namespaces, setting this to true can have unintended consequences.
+      1. Upgrades will overwrite the global CRDs and could disrupt the other users of ECK who may be running a different version.
+      2. Uninstalling the chart will delete the CRDs and potentially cause Elastic resources deployed by other users to be removed as well.
+    EOF
+  default     = true
 }
