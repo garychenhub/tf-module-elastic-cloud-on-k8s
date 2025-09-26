@@ -42,6 +42,23 @@ Type: `string`
 
 Default: `"3.1.0"`
 
+### <a name="input_config_validate_storage_class"></a> [config\_validate\_storage\_class](#input\_config\_validate\_storage\_class)
+
+Description:     validateStorageClass specifies whether storage classes volume expansion support should be verified.  
+    Can be disabled if cluster-wide storage class RBAC access is not available.
+
+Type: `bool`
+
+Default: `true`
+
+### <a name="input_create_cluster_scoped_resources"></a> [create\_cluster\_scoped\_resources](#input\_create\_cluster\_scoped\_resources)
+
+Description:     createClusterScopedResources determines whether cluster-scoped resources (ClusterRoles, ClusterRoleBindings) should be created.
+
+Type: `bool`
+
+Default: `true`
+
 ### <a name="input_eck_operator_release_name"></a> [eck\_operator\_release\_name](#input\_eck\_operator\_release\_name)
 
 Description: The name of the Helm release for the ECK operator.
@@ -57,6 +74,22 @@ Description:       installCRDs determines whether Custom Resource Definitions (C
       If you are sharing a cluster with other users who may want to install ECK on their own namespaces, setting this to true can have unintended consequences.  
       1. Upgrades will overwrite the global CRDs and could disrupt the other users of ECK who may be running a different version.  
       2. Uninstalling the chart will delete the CRDs and potentially cause Elastic resources deployed by other users to be removed as well.
+
+Type: `bool`
+
+Default: `true`
+
+### <a name="input_managed_namespaces"></a> [managed\_namespaces](#input\_managed\_namespaces)
+
+Description: managedNamespaces is the set of namespaces that the operator manages. Leave empty to manage all namespaces.
+
+Type: `list(string)`
+
+Default: `[]`
+
+### <a name="input_webhook_enable"></a> [webhook\_enable](#input\_webhook\_enable)
+
+Description: enabled determines whether the webhook is installed.
 
 Type: `bool`
 
