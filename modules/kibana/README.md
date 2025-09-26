@@ -52,6 +52,14 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
+### <a name="input_es_namespace"></a> [es\_namespace](#input\_es\_namespace)
+
+Description: The namespace where the Elasticsearch cluster is deployed. If not specified, defaults to the same namespace as Kibana.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_replicas"></a> [replicas](#input\_replicas)
 
 Description: The number of Kibana.
@@ -59,6 +67,48 @@ Description: The number of Kibana.
 Type: `number`
 
 Default: `1`
+
+### <a name="input_resources"></a> [resources](#input\_resources)
+
+Description: Compute resource requirements for the Kibana container.
+Based on official ECK recommendations:
+- requests: Minimum resources required for scheduling (memory: 1Gi, cpu: 0.5)
+- limits: Maximum resources the container can use (memory: 2.5Gi, cpu: 2)
+
+Note: ECK applies a default memory limit of 1Gi if not specified.
+For production workloads, consider setting limits to ensure QoS.
+
+See: https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/manage-compute-resources
+
+Type:
+
+```hcl
+object({
+    requests = optional(object({
+      memory = optional(string, "1Gi")
+      cpu    = optional(string, "0.5")
+    }), {})
+    limits = optional(object({
+      memory = optional(string, "2.5Gi")
+      cpu    = optional(string, "2")
+    }), {})
+  })
+```
+
+Default:
+
+```hcl
+{
+  limits = {
+    cpu = "2"
+    memory = "2.5Gi"
+  }
+  requests = {
+    cpu = "0.5"
+    memory = "1Gi"
+  }
+}
+```
 
 ### <a name="input_secure_settings"></a> [secure\_settings](#input\_secure\_settings)
 

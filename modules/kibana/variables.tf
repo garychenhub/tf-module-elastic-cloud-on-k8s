@@ -24,6 +24,46 @@ variable "es_cluster_name" {
   type        = string
 }
 
+variable "es_namespace" {
+  description = "The namespace where the Elasticsearch cluster is deployed. If not specified, defaults to the same namespace as Kibana."
+  type        = string
+  default     = null
+}
+
+variable "resources" {
+  type = object({
+    requests = optional(object({
+      memory = optional(string, "1Gi")
+      cpu    = optional(string, "0.5")
+    }), {})
+    limits = optional(object({
+      memory = optional(string, "2.5Gi")
+      cpu    = optional(string, "2")
+    }), {})
+  })
+  description = <<EOF
+    Compute resource requirements for the Kibana container.
+    Based on official ECK recommendations:
+    - requests: Minimum resources required for scheduling (memory: 1Gi, cpu: 0.5)
+    - limits: Maximum resources the container can use (memory: 2.5Gi, cpu: 2)
+    
+    Note: ECK applies a default memory limit of 1Gi if not specified.
+    For production workloads, consider setting limits to ensure QoS.
+    
+    See: https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/manage-compute-resources
+  EOF
+  default = {
+    requests = {
+      memory = "1Gi"
+      cpu    = "0.5"
+    }
+    limits = {
+      memory = "2.5Gi"
+      cpu    = "2"
+    }
+  }
+}
+
 variable "secure_settings" {
   type = list(object({
     secret_name = string

@@ -47,6 +47,19 @@ module "kibana" {
   namespace       = var.namespace
   replicas        = var.replicas
   es_cluster_name = var.es_cluster_name
+  es_namespace    = var.es_namespace  # 可選：如果 Elasticsearch 在不同的 namespace
+
+  # 資源配置 - 使用官方建議的預設值
+  resources = {
+    requests = {
+      memory = "1Gi"
+      cpu    = "0.5"
+    }
+    limits = {
+      memory = "2.5Gi"
+      cpu    = "2"
+    }
+  }
 
   # 配置 Secure Settings
   secure_settings = [

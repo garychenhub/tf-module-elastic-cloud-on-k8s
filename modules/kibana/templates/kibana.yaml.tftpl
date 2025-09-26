@@ -8,6 +8,9 @@ spec:
   count: ${replicas}
   elasticsearchRef:
     name: ${es_cluster_name}
+%{ if es_namespace != null && es_namespace != namespace ~}
+    namespace: ${es_namespace}
+%{ endif ~}
 %{ if length(secure_settings) > 0 ~}
   secureSettings:
 %{ for setting in secure_settings ~}
@@ -22,4 +25,29 @@ spec:
 %{ endfor ~}
 %{ endif ~}
 %{ endfor ~}
+%{ endif ~}
+%{ if resources != null ~}
+  podTemplate:
+    spec:
+      containers:
+      - name: kibana
+        resources:
+%{ if resources.requests != null ~}
+          requests:
+%{ if resources.requests.memory != null ~}
+            memory: ${resources.requests.memory}
+%{ endif ~}
+%{ if resources.requests.cpu != null ~}
+            cpu: ${resources.requests.cpu}
+%{ endif ~}
+%{ endif ~}
+%{ if resources.limits != null ~}
+          limits:
+%{ if resources.limits.memory != null ~}
+            memory: ${resources.limits.memory}
+%{ endif ~}
+%{ if resources.limits.cpu != null ~}
+            cpu: ${resources.limits.cpu}
+%{ endif ~}
+%{ endif ~}
 %{ endif ~}
