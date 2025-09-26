@@ -18,11 +18,3 @@ module "eck_cloud_on_k8s" {
 
   depends_on = [kubernetes_namespace_v1.elastic_system]
 }
-
-module "es_cluster" {
-  source = "../../modules/elasticsearch_cluster"
-
-  es_cluster_name = "demo-es-cluster"
-  es_version      = "9.1.4"
-  namespace       = kubernetes_namespace_v1.elastic_system.metadata[0].name
-}
