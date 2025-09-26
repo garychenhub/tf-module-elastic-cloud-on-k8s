@@ -23,7 +23,7 @@ variable "node_sets" {
   type = list(object({
     name    = string
     count   = number
-    config  = optional(map(any), {})
+    config  = optional(map(string), {})
     storage = optional(object({
       size         = optional(string, "1Gi")
       storage_class = optional(string, "")

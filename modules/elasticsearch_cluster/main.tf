@@ -6,4 +6,9 @@ resource "kubernetes_manifest" "es_cluster" {
     node_sets       = var.node_sets
     global_config   = var.global_config
   }))
+
+  field_manager {
+    name            = "terraform"
+    force_conflicts = true
+  }
 }
