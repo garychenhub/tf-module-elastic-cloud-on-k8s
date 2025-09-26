@@ -1,0 +1,78 @@
+# Terraform 相關檔案
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+
+# Terraform 計劃檔案
+*.tfplan
+
+# 敏感資訊檔案
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI 配置檔案
+.terraformrc
+terraform.rc
+
+# 環境變數檔案
+.env
+.env.local
+.env.*.local
+
+# IDE 和編輯器檔案
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS 系統檔案
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# 暫存檔案和目錄
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# 日誌檔案
+*.log
+
+# 備份檔案
+*.bak
+*.backup
+
+# 測試輸出
+test-results/
+coverage/
+
+# Kubernetes 相關檔案 (如果包含敏感資訊)
+kubeconfig
+*.kubeconfig
+kube-config
+
+# 本地開發用的範例值檔案
+terraform.tfvars.example
+*.auto.tfvars
+local.tf
+
+# 文檔生成的暫存檔案
+.terraform-docs.yml
+
+# 其他常見的忽略檔案
+node_modules/
+.npm/
+.yarn/
+vendor/

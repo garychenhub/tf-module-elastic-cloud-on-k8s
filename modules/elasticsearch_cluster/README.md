@@ -88,13 +88,48 @@ Default:
 [
   {
     "config": {
-      "node.store.allow_mmap": false
+      "vm.max_map_count": "262144"
     },
     "count": 1,
     "name": "default"
   }
 ]
 ```
+
+### <a name="input_secure_settings"></a> [secure\_settings](#input\_secure\_settings)
+
+Description: List of secure settings to be injected into Elasticsearch keystore from Kubernetes secrets.
+Each object should contain:
+- secret\_name: Name of the Kubernetes secret containing the secure settings
+- entries: Optional list of specific entries to project from the secret
+  - key: The key in the secret to project
+  - path: Optional custom path in the keystore (defaults to the key name)
+
+If entries is empty or not specified, all keys from the secret will be projected
+using their original names as keystore paths.
+
+Type:
+
+```hcl
+list(object({
+    secret_name = string
+    entries = optional(list(object({
+      key  = string
+      path = optional(string)
+    })), [])
+  }))
+```
+
+Default: `[]`
+
+### <a name="input_volume_claim_delete_policy"></a> [volume\_claim\_delete\_policy](#input\_volume\_claim\_delete\_policy)
+
+Description: The possible values are DeleteOnScaledownAndClusterDeletion and DeleteOnScaledownOnly.
+See: https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/volume-claim-templates#k8s_controlling_volume_claim_deletion
+
+Type: `string`
+
+Default: `"DeleteOnScaledownAndClusterDeletion"`
 
 ## Outputs
 
