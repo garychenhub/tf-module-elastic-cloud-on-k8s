@@ -17,10 +17,6 @@ resource "helm_release" "eck_operator" {
       value = var.install_crds ? "true" : "false"
     },
     {
-      name  = "managedNamespaces"
-      value = "[${join(",", var.managed_namespaces)}]"
-    },
-    {
       name  = "createClusterScopedResources"
       value = var.create_cluster_scoped_resources ? "true" : "false"
     },
@@ -32,5 +28,12 @@ resource "helm_release" "eck_operator" {
       name  = "config.validateStorageClass"
       value = var.config_validate_storage_class ? "true" : "false"
     }
+  ]
+
+  set_list = [
+    {
+      name  = "managedNamespaces"
+      value = var.managed_namespaces
+    },
   ]
 }
