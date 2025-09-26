@@ -1,0 +1,10 @@
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: ${kibana_name}
+  namespace: ${namespace}
+spec:
+  version: ${kibana_version}
+  count: ${replicas}
+  elasticsearchRef:
+    name: ${es_cluster_name}
