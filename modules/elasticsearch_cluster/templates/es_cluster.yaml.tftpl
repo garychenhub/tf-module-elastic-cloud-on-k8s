@@ -11,7 +11,7 @@ spec:
       count: ${node_set.count}
       config:
 %{ for key, value in merge(global_config, node_set.config) ~}
-        ${key}: ${jsonencode(value)}
+        ${key}: ${value}
 %{ endfor ~}
 %{ if node_set.storage != null && (node_set.storage.size != "" || node_set.storage.storage_class != "") ~}
       volumeClaimTemplates:
