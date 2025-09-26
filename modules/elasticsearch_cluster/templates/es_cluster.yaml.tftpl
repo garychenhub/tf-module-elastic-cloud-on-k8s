@@ -21,6 +21,18 @@ spec:
 %{ endif ~}
 %{ endfor ~}
 %{ endif ~}
+%{ if update_strategy != null ~}
+  updateStrategy:
+%{ if update_strategy.change_budget != null ~}
+    changeBudget:
+%{ if update_strategy.change_budget.max_surge != null ~}
+      maxSurge: ${update_strategy.change_budget.max_surge}
+%{ endif ~}
+%{ if update_strategy.change_budget.max_unavailable != null ~}
+      maxUnavailable: ${update_strategy.change_budget.max_unavailable}
+%{ endif ~}
+%{ endif ~}
+%{ endif ~}
   nodeSets:
 %{ for node_set in node_sets ~}
     - name: ${node_set.name}

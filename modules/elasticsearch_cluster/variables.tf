@@ -59,6 +59,7 @@ variable "node_sets" {
       name  = "default"
       count = 1
       config = {
+        "node.roles"       = "[\"master\", \"data\", \"ingest\"]"
         "vm.max_map_count" = "262144"
       }
     }
@@ -85,4 +86,36 @@ variable "secure_settings" {
     using their original names as keystore paths.
   EOF
   default     = []
+}
+
+variable "update_strategy" {
+  type = object({
+    change_budget = optional(object({
+      max_surge       = optional(number)
+      max_unavailable = optional(number, 1)
+    }))
+  })
+  description = <<EOF
+    Pod update strategy configuration to limit the number of simultaneous changes.
+    
+    change_budget:
+      - max_surge: Number of extra Pods that can be temporarily scheduled exceeding 
+                   the number of Pods defined in the specification. 
+                   null = default value used, negative = unbounded, non-negative = value used as is
+      - max_unavailable: Number of Pods that can be unavailable out of the total number 
+                         of Pods in the currently applied specification.
+                         Default is 1 to ensure cluster stability.
+    
+    Default behavior when not specified:
+      max_surge: -1 (unbounded)
+      max_unavailable: 1
+    
+    See: https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/update-strategy
+  EOF
+  default = {
+    change_budget = {
+      max_surge       = -1
+      max_unavailable = 1
+    }
+  }
 }

@@ -131,6 +131,46 @@ Type: `string`
 
 Default: `"DeleteOnScaledownAndClusterDeletion"`
 
+### <a name="input_update_strategy"></a> [update\_strategy](#input\_update\_strategy)
+
+Description: Pod update strategy configuration to limit the number of simultaneous changes.
+
+change\_budget:
+- max\_surge: Number of extra Pods that can be temporarily scheduled exceeding 
+             the number of Pods defined in the specification. 
+             null = default value used, negative = unbounded, non-negative = value used as is
+- max\_unavailable: Number of Pods that can be unavailable out of the total number 
+                   of Pods in the currently applied specification.
+                   Default is 1 to ensure cluster stability.
+
+Default behavior when not specified:
+max\_surge: -1 (unbounded)
+max\_unavailable: 1
+
+See: https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/update-strategy
+
+Type:
+
+```hcl
+object({
+    change_budget = optional(object({
+      max_surge       = optional(number)
+      max_unavailable = optional(number, 1)
+    }))
+  })
+```
+
+Default:
+
+```hcl
+{
+  change_budget = {
+    max_surge       = -1
+    max_unavailable = 1
+  }
+}
+```
+
 ## Outputs
 
 No outputs.
