@@ -15,6 +15,10 @@ variable "eck_deploy_namespace" {
   description = "The Kubernetes namespace where the ECK operator will be deployed."
 }
 
+########################################################################################################################
+##### Values
+########################################################################################################################
+# Restricted installation
 variable "install_crds" {
   type        = bool
   description = <<EOF
@@ -24,5 +28,34 @@ variable "install_crds" {
       1. Upgrades will overwrite the global CRDs and could disrupt the other users of ECK who may be running a different version.
       2. Uninstalling the chart will delete the CRDs and potentially cause Elastic resources deployed by other users to be removed as well.
     EOF
+  default     = true
+}
+
+variable "managed_namespaces" {
+  type        = list(string)
+  description = "managedNamespaces is the set of namespaces that the operator manages. Leave empty to manage all namespaces."
+  default     = []
+}
+
+variable "create_cluster_scoped_resources" {
+  type        = bool
+  description = <<EOF
+    createClusterScopedResources determines whether cluster-scoped resources (ClusterRoles, ClusterRoleBindings) should be created.
+  EOF
+  default     = true
+}
+
+variable "webhook_enable" {
+  type        = bool
+  description = "enabled determines whether the webhook is installed."
+  default     = true
+}
+
+variable "config_validate_storage_class" {
+  type        = bool
+  description = <<EOF
+    validateStorageClass specifies whether storage classes volume expansion support should be verified.
+    Can be disabled if cluster-wide storage class RBAC access is not available.
+  EOF
   default     = true
 }
