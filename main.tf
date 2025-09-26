@@ -18,7 +18,8 @@ resource "helm_release" "eck_operator" {
     },
     {
       name  = "managedNamespaces"
-      value = "[${join(",", var.managed_namespaces)}]"
+      value = var.managed_namespaces
+      # value = "[${join(",", var.managed_namespaces)}]"
     },
     {
       name  = "createClusterScopedResources"
