@@ -14,27 +14,22 @@ resource "helm_release" "eck_operator" {
   set = [
     {
       name  = "installCRDs"
-      type  = "string"
       value = var.install_crds ? "true" : "false"
     },
     {
       name  = "managedNamespaces"
-      type  = "list"
       value = join(",", var.managed_namespaces)
     },
     {
       name  = "createClusterScopedResources"
-      type  = "bool"
       value = var.create_cluster_scoped_resources ? "true" : "false"
     },
     {
       name  = "webhook.enabled"
-      type  = "bool"
       value = var.webhook_enable ? "true" : "false"
     },
     {
       name  = "config.validateStorageClass"
-      type  = "bool"
       value = var.config_validate_storage_class ? "true" : "false"
     }
   ]
