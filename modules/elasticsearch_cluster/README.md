@@ -36,9 +36,65 @@ Description: The version of Elasticsearch to deploy.
 
 Type: `string`
 
+### <a name="input_namespace"></a> [namespace](#input\_namespace)
+
+Description: The Kubernetes namespace where the Elasticsearch cluster will be deployed.
+
+Type: `string`
+
 ## Optional Inputs
 
-No optional inputs.
+The following input variables are optional (have default values):
+
+### <a name="input_global_config"></a> [global\_config](#input\_global\_config)
+
+Description: Global Elasticsearch configuration applied to all node sets
+
+Type: `map(any)`
+
+Default: `{}`
+
+### <a name="input_node_sets"></a> [node\_sets](#input\_node\_sets)
+
+Description: Configuration for Elasticsearch node sets
+
+Type:
+
+```hcl
+list(object({
+    name    = string
+    count   = number
+    config  = optional(map(string), {})
+    storage = optional(object({
+      size         = optional(string, "1Gi")
+      storage_class = optional(string, "")
+    }), {})
+    resources = optional(object({
+      requests = optional(object({
+        memory = optional(string, "1Gi")
+        cpu    = optional(string, "500m")
+      }), {})
+      limits = optional(object({
+        memory = optional(string, "2Gi")
+        cpu    = optional(string, "1")
+      }), {})
+    }), {})
+  }))
+```
+
+Default:
+
+```json
+[
+  {
+    "config": {
+      "node.store.allow_mmap": false
+    },
+    "count": 1,
+    "name": "default"
+  }
+]
+```
 
 ## Outputs
 
