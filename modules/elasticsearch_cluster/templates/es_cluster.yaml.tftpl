@@ -1,3 +1,4 @@
+# modules/elasticsearch_cluster/templates/es_cluster.yaml.tftpl
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
@@ -6,7 +7,50 @@ metadata:
 spec:
   version: ${es_version}
   nodeSets:
-    - name: default
-      count: 1
+%{ for node_set in node_sets ~}
+    - name: ${node_set.name}
+      count: ${node_set.count}
       config:
-        node.store.allow_mmap: false
+%{ for key, value in merge(global_config, node_set.config) ~}
+        ${key}: ${jsonencode(value)}
+%{ endfor ~}
+%{ if node_set.storage != null && (node_set.storage.size != "" || node_set.storage.storage_class != "") ~}
+      volumeClaimTemplates:
+        - metadata:
+            name: elasticsearch-data
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: ${node_set.storage.size}
+%{ if node_set.storage.storage_class != "" ~}
+            storageClassName: ${node_set.storage.storage_class}
+%{ endif ~}
+%{ endif ~}
+%{ if node_set.resources.requests != null || node_set.resources.limits != null ~}
+      podTemplate:
+        spec:
+          containers:
+            - name: elasticsearch
+              resources:
+%{ if node_set.resources.requests != null ~}
+                requests:
+%{ if node_set.resources.requests.memory != "" ~}
+                  memory: ${node_set.resources.requests.memory}
+%{ endif ~}
+%{ if node_set.resources.requests.cpu != "" ~}
+                  cpu: ${node_set.resources.requests.cpu}
+%{ endif ~}
+%{ endif ~}
+%{ if node_set.resources.limits != null ~}
+                limits:
+%{ if node_set.resources.limits.memory != "" ~}
+                  memory: ${node_set.resources.limits.memory}
+%{ endif ~}
+%{ if node_set.resources.limits.cpu != "" ~}
+                  cpu: ${node_set.resources.limits.cpu}
+%{ endif ~}
+%{ endif ~}
+%{ endif ~}
+%{ endfor ~}
