@@ -4,11 +4,13 @@ locals {
 }
 
 resource "helm_release" "eck_operator" {
-  name       = var.eck_operator_release_name
-  chart      = local.eck_operator_chart_name
-  repository = local.eck_chart_repository
-  version    = var.chart_version
-  namespace  = var.eck_deploy_namespace
+  name          = var.eck_operator_release_name
+  chart         = local.eck_operator_chart_name
+  repository    = local.eck_chart_repository
+  version       = var.chart_version
+  namespace     = var.eck_deploy_namespace
+  wait          = true
+  wait_for_jobs = true
 
   # Restricted installation
   set = [
