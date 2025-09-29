@@ -10,8 +10,21 @@ resource "kubernetes_manifest" "kibana" {
     resources       = var.resources
   }))
 
-  # field_manager {
-  #   name            = "terraform"
-  #   force_conflicts = true
-  # }
+  computed_fields = [
+    "metadata.generation",
+    "metadata.resourceVersion",
+    "metadata.uid",
+    "status"
+  ]
+
+  field_manager {
+    name            = "terraform"
+    force_conflicts = true
+  }
+
+  wait {
+    fields = {
+      "status.health" = "green"
+    }
+  }
 }
