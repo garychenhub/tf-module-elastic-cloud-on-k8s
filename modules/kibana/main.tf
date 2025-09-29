@@ -9,4 +9,9 @@ resource "kubernetes_manifest" "kibana" {
     secure_settings = var.secure_settings
     resources       = var.resources
   }))
+
+  field_manager {
+    name            = "terraform"
+    force_conflicts = true
+  }
 }
