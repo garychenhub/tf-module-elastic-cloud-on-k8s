@@ -33,12 +33,12 @@ variable "es_namespace" {
 variable "resources" {
   type = object({
     requests = optional(object({
-      memory = optional(string, "1Gi")
-      cpu    = optional(string, "0.5")
+      memory = optional(string, "2Gi")
+      cpu    = optional(string, "1")
     }), {})
     limits = optional(object({
-      memory = optional(string, "2.5Gi")
-      cpu    = optional(string, "2")
+      memory = optional(string, "2i")
+      cpu    = optional(string, "1")
     }), {})
   })
   description = <<EOF

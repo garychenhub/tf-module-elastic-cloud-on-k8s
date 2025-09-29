@@ -39,17 +39,17 @@ variable "node_sets" {
     count  = number
     config = optional(map(string), {})
     storage = optional(object({
-      size          = optional(string, "1Gi")
+      size          = optional(string, "10Gi")
       storage_class = optional(string, "")
     }), {})
     resources = optional(object({
       requests = optional(object({
-        memory = optional(string, "1Gi")
-        cpu    = optional(string, "500m")
+        memory = optional(string, "4Gi")
+        cpu    = optional(string, "2")
       }), {})
       limits = optional(object({
-        memory = optional(string, "2Gi")
-        cpu    = optional(string, "1")
+        memory = optional(string, "4Gi")
+        cpu    = optional(string, "2")
       }), {})
     }), {})
   }))
