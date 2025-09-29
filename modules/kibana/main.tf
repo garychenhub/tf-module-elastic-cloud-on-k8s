@@ -11,10 +11,27 @@ resource "kubernetes_manifest" "kibana" {
   }))
 
   computed_fields = [
+    # metadata
+    "metadata.annotations",
+    "metadata.finalizers",
     "metadata.generation",
+    "metadata.managedFields",
     "metadata.resourceVersion",
     "metadata.uid",
-    "status"
+    "metadata.creationTimestamp",
+
+    # PodTemplate metadata
+    "spec.podTemplate.metadata",
+    "spec.podTemplate.metadata.creationTimestamp",
+    "spec.podTemplate.metadata.labels",
+    "spec.podTemplate.metadata.annotations",
+
+    # Status
+    "status",
+    "status.health",
+    "status.availableNodes",
+    "status.version",
+    "status.observedGeneration"
   ]
 
   field_manager {
