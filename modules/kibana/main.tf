@@ -10,8 +10,8 @@ resource "kubernetes_manifest" "kibana" {
     resources       = var.resources
   }))
 
-  field_manager {
-    name            = "terraform"
-    force_conflicts = true
-  }
+  # field_manager {
+  #   name            = "terraform"
+  #   force_conflicts = true
+  # }
 }
