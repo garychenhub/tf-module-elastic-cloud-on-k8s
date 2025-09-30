@@ -14,21 +14,7 @@ spec:
 %{ if es_namespace != null && es_namespace != namespace ~}
     namespace: ${es_namespace}
 %{ endif ~}
-%{ if length(secure_settings) > 0 ~}
-  secureSettings:
-%{ for setting in secure_settings ~}
-  - secretName: ${setting.secret_name}
-%{ if length(setting.entries) > 0 ~}
-    entries:
-%{ for entry in setting.entries ~}
-    - key: ${entry.key}
-%{ if entry.path != null ~}
-      path: ${entry.path}
-%{ endif ~}
-%{ endfor ~}
-%{ endif ~}
-%{ endfor ~}
-%{ endif ~}
+
   podTemplate:
     spec:
       containers:
