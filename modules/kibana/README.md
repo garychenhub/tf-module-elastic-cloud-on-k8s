@@ -136,6 +136,14 @@ list(object({
 
 Default: `[]`
 
+### <a name="input_kibana_image"></a> [kibana\_image](#input\_kibana\_image)
+
+Description: Custom Kibana Docker image to use. If not specified, the default Kibana image will be used.
+
+Type: `string`
+
+Default: `null`
+
 ## Outputs
 
 No outputs.

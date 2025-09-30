@@ -125,3 +125,53 @@ variable "update_strategy" {
     }
   }
 }
+
+variable "security_context" {
+  type = object({
+    allow_privilege_escalation = optional(bool, false)
+    capabilities = optional(object({
+      drop = optional(list(string), ["ALL"])
+    }), { drop = ["ALL"] })
+    privileged                = optional(bool, false)
+    read_only_root_filesystem = optional(bool, true)
+  })
+  description = <<EOF
+    Security context configuration for Elasticsearch containers.
+    
+    - allow_privilege_escalation: Whether a process can gain more privileges than its parent process. Default: false
+    - capabilities.drop: List of capabilities to drop from the container. Default: ["ALL"]
+    - privileged: Whether the container runs in privileged mode. Default: false
+    - read_only_root_filesystem: Whether the container has a read-only root filesystem. Default: true
+    
+    Based on Elastic's security recommendations:
+    https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/security-context
+  EOF
+  default = {
+    allow_privilege_escalation = false
+    capabilities = {
+      drop = ["ALL"]
+    }
+    privileged                = false
+    read_only_root_filesystem = true
+  }
+}
+
+variable "image_pull_policy" {
+  type        = string
+  description = <<EOF
+    Image pull policy for Elasticsearch containers.
+    
+    Possible values:
+    - Always: Always pull the image from the registry
+    - IfNotPresent: Pull the image only if it's not present locally (default)
+    - Never: Never pull the image from the registry
+    
+    See: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
+  EOF
+  default     = "IfNotPresent"
+  
+  validation {
+    condition     = contains(["Always", "IfNotPresent", "Never"], var.image_pull_policy)
+    error_message = "The image_pull_policy must be one of: Always, IfNotPresent, Never."
+  }
+}

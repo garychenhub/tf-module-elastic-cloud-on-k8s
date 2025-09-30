@@ -85,3 +85,29 @@ variable "secure_settings" {
   EOF
   default     = []
 }
+
+variable "kibana_image" {
+  description = "Custom Kibana Docker image. If not specified, the default Kibana image will be used."
+  type        = string
+  default     = null
+}
+
+variable "image_pull_policy" {
+  type        = string
+  description = <<EOF
+    Image pull policy for Kibana containers.
+    
+    Possible values:
+    - Always: Always pull the image from the registry
+    - IfNotPresent: Pull the image only if it's not present locally (default)
+    - Never: Never pull the image from the registry
+    
+    See: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
+  EOF
+  default     = "IfNotPresent"
+  
+  validation {
+    condition     = contains(["Always", "IfNotPresent", "Never"], var.image_pull_policy)
+    error_message = "The image_pull_policy must be one of: Always, IfNotPresent, Never."
+  }
+}

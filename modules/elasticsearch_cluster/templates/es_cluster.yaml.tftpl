@@ -58,11 +58,21 @@ spec:
             storageClassName: ${node_set.storage.storage_class}
 %{ endif ~}
 %{ endif ~}
-%{ if node_set.resources.requests != null || node_set.resources.limits != null ~}
       podTemplate:
         spec:
+          securityContext:
+            allowPrivilegeEscalation: ${security_context.allow_privilege_escalation}
+            capabilities:
+              drop:
+%{ for capability in security_context.capabilities.drop ~}
+              - ${capability}
+%{ endfor ~}
+            privileged: ${security_context.privileged}
+            readOnlyRootFilesystem: ${security_context.read_only_root_filesystem}
           containers:
             - name: elasticsearch
+              imagePullPolicy: ${image_pull_policy}
+%{ if node_set.resources.requests != null || node_set.resources.limits != null ~}
               resources:
 %{ if node_set.resources.requests != null ~}
                 requests:

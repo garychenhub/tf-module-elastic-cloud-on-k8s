@@ -5,6 +5,9 @@ metadata:
   namespace: ${namespace}
 spec:
   version: ${kibana_version}
+%{ if kibana_image != null && kibana_image != "" ~}
+  image: ${kibana_image}
+%{ endif ~}
   count: ${replicas}
   elasticsearchRef:
     name: ${es_cluster_name}
@@ -26,11 +29,12 @@ spec:
 %{ endif ~}
 %{ endfor ~}
 %{ endif ~}
-%{ if resources != null ~}
   podTemplate:
     spec:
       containers:
       - name: kibana
+        imagePullPolicy: ${image_pull_policy}
+%{ if resources != null ~}
         resources:
 %{ if resources.requests != null ~}
           requests:
