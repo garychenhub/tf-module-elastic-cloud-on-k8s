@@ -125,4 +125,3 @@ variable "update_strategy" {
     }
   }
 }
-}
