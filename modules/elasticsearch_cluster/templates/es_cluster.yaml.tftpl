@@ -69,10 +69,6 @@ spec:
 %{ endfor ~}
             privileged: ${security_context.privileged}
             readOnlyRootFilesystem: ${security_context.read_only_root_filesystem}
-%{ if security_context.seccomp_profile != null ~}
-            seccompProfile:
-              type: ${security_context.seccomp_profile.type}
-%{ endif ~}
           containers:
             - name: elasticsearch
               imagePullPolicy: ${image_pull_policy}
