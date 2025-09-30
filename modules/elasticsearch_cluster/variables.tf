@@ -158,7 +158,7 @@ variable "security_context" {
     }
     privileged                = false
     read_only_root_filesystem = true
-    seccomp_profile = null
+    seccomp_profile           = null
   }
 }
 
@@ -175,7 +175,7 @@ variable "image_pull_policy" {
     See: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
   EOF
   default     = "IfNotPresent"
-  
+
   validation {
     condition     = contains(["Always", "IfNotPresent", "Never"], var.image_pull_policy)
     error_message = "The image_pull_policy must be one of: Always, IfNotPresent, Never."
