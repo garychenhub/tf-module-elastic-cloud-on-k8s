@@ -29,11 +29,14 @@ spec:
 %{ endif ~}
 %{ endfor ~}
 %{ endif ~}
+%{ if resources != null || image_pull_policy != "IfNotPresent" ~}
   podTemplate:
     spec:
       containers:
       - name: kibana
+%{ if image_pull_policy != "IfNotPresent" ~}
         imagePullPolicy: ${image_pull_policy}
+%{ endif ~}
 %{ if resources != null ~}
         resources:
 %{ if resources.requests != null ~}
@@ -52,6 +55,7 @@ spec:
 %{ endif ~}
 %{ if resources.limits.cpu != null ~}
             cpu: ${resources.limits.cpu}
+%{ endif ~}
 %{ endif ~}
 %{ endif ~}
 %{ endif ~}
