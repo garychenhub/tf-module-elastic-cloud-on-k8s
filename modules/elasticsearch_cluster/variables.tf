@@ -134,6 +134,9 @@ variable "security_context" {
     }), { drop = ["ALL"] })
     privileged                = optional(bool, false)
     read_only_root_filesystem = optional(bool, true)
+    seccomp_profile = optional(object({
+      type = string
+    }), null)
   })
   description = <<EOF
     Security context configuration for Elasticsearch containers.
@@ -142,6 +145,8 @@ variable "security_context" {
     - capabilities.drop: List of capabilities to drop from the container. Default: ["ALL"]
     - privileged: Whether the container runs in privileged mode. Default: false
     - read_only_root_filesystem: Whether the container has a read-only root filesystem. Default: true
+    - seccomp_profile.type: Optional seccomp profile type for the container. If not specified, no seccompProfile will be set.
+      Possible values: "RuntimeDefault", "Localhost", "Unconfined"
     
     Based on Elastic's security recommendations:
     https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/security-context
@@ -153,6 +158,7 @@ variable "security_context" {
     }
     privileged                = false
     read_only_root_filesystem = true
+    seccomp_profile = null
   }
 }
 
