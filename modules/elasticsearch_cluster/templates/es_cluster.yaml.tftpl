@@ -5,6 +5,9 @@ metadata:
   namespace: ${namespace}
 spec:
   version: ${es_version}
+%{ if es_image != null && es_image != "" ~}
+  image: ${es_image}
+%{ endif ~}
   volumeClaimDeletePolicy: ${volume_claim_delete_policy}
 %{ if length(secure_settings) > 0 ~}
   secureSettings:

@@ -8,6 +8,12 @@ variable "es_version" {
   description = "The version of Elasticsearch to deploy."
 }
 
+variable "es_image" {
+  description = "Custom Elasticsearch Docker image. If not specified, the default Elasticsearch image will be used."
+  type        = string
+  default     = null
+}
+
 variable "volume_claim_delete_policy" {
   type        = string
   description = <<EOF
@@ -118,4 +124,5 @@ variable "update_strategy" {
       max_unavailable = 1
     }
   }
+}
 }

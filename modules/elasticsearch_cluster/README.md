@@ -46,6 +46,14 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
+### <a name="input_es_image"></a> [es\_image](#input\_es\_image)
+
+Description: Custom Elasticsearch Docker image. If not specified, the default Elasticsearch image will be used.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_global_config"></a> [global\_config](#input\_global\_config)
 
 Description: Global Elasticsearch configuration applied to all node sets
