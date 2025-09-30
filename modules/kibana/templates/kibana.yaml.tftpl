@@ -14,16 +14,15 @@ spec:
 %{ if es_namespace != null && es_namespace != namespace ~}
     namespace: ${es_namespace}
 %{ endif ~}
-
   podTemplate:
     spec:
       containers:
-      - name: kibana
-        imagePullPolicy: ${image_pull_policy}
-        resources:
-          requests:
-            memory: ${resources.requests.memory}
-            cpu: ${resources.requests.cpu}
-          limits:
-            memory: ${resources.limits.memory}
-            cpu: ${resources.limits.cpu}
+        - name: kibana
+          imagePullPolicy: ${image_pull_policy}
+          resources:
+            requests:
+              memory: ${resources.requests.memory}
+              cpu: ${resources.requests.cpu}
+            limits:
+              memory: ${resources.limits.memory}
+              cpu: ${resources.limits.cpu}
