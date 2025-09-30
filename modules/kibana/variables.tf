@@ -32,20 +32,20 @@ variable "es_namespace" {
 
 variable "resources" {
   type = object({
-    requests = optional(object({
-      memory = optional(string, "2Gi")
-      cpu    = optional(string, "1")
-    }), {})
-    limits = optional(object({
-      memory = optional(string, "2i")
-      cpu    = optional(string, "1")
-    }), {})
+    requests = object({
+      memory = string
+      cpu    = string
+    })
+    limits = object({
+      memory = string
+      cpu    = string
+    })
   })
   description = <<EOF
     Compute resource requirements for the Kibana container.
     Based on official ECK recommendations:
-    - requests: Minimum resources required for scheduling (memory: 1Gi, cpu: 0.5)
-    - limits: Maximum resources the container can use (memory: 2.5Gi, cpu: 2)
+    - requests: Minimum resources required for scheduling
+    - limits: Maximum resources the container can use
     
     Note: ECK applies a default memory limit of 1Gi if not specified.
     For production workloads, consider setting limits to ensure QoS.
@@ -111,3 +111,5 @@ variable "image_pull_policy" {
     error_message = "The image_pull_policy must be one of: Always, IfNotPresent, Never."
   }
 }
+
+

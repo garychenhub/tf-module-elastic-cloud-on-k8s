@@ -29,29 +29,15 @@ spec:
 %{ endif ~}
 %{ endfor ~}
 %{ endif ~}
-%{ if resources != null ~}
   podTemplate:
     spec:
       containers:
       - name: kibana
         imagePullPolicy: ${image_pull_policy}
         resources:
-%{ if resources.requests != null ~}
           requests:
-%{ if resources.requests.memory != null ~}
             memory: ${resources.requests.memory}
-%{ endif ~}
-%{ if resources.requests.cpu != null ~}
             cpu: ${resources.requests.cpu}
-%{ endif ~}
-%{ endif ~}
-%{ if resources.limits != null ~}
           limits:
-%{ if resources.limits.memory != null ~}
             memory: ${resources.limits.memory}
-%{ endif ~}
-%{ if resources.limits.cpu != null ~}
             cpu: ${resources.limits.cpu}
-%{ endif ~}
-%{ endif ~}
-%{ endif ~}
