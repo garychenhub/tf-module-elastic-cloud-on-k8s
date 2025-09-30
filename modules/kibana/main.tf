@@ -26,6 +26,7 @@ resource "kubernetes_manifest" "kibana" {
     "spec.podTemplate.metadata.creationTimestamp",
     "spec.podTemplate.metadata.labels",
     "spec.podTemplate.metadata.annotations",
+    "spec.podTemplate.spec.containers",
 
     # Status
     "status",
