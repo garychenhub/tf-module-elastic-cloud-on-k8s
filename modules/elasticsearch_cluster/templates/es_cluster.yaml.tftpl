@@ -18,13 +18,13 @@ spec:
 %{ if length(http.service.metadata.labels) > 0 ~}
         labels:
 %{ for key, value in http.service.metadata.labels ~}
-          ${key}: ${value}
+          ${key}: "${value}"
 %{ endfor ~}
 %{ endif ~}
 %{ if length(http.service.metadata.annotations) > 0 ~}
         annotations:
 %{ for key, value in http.service.metadata.annotations ~}
-          ${key}: ${value}
+          ${key}: "${value}"
 %{ endfor ~}
 %{ endif ~}
 %{ endif ~}
