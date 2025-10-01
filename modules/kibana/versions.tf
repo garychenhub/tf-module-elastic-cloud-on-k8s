@@ -4,5 +4,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.37"
     }
+
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "~> 1.19.0"
+    }
   }
 }
