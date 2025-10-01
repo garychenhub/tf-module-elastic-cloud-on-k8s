@@ -8,8 +8,8 @@
 #     namespace                  = var.namespace
 #     node_sets                  = var.node_sets
 #     global_config              = var.global_config
-#     secure_settings            = var.secure_settings
 #     update_strategy            = var.update_strategy
+#     http                       = var.http
 #   }))
 #
 #   field_manager {
@@ -28,7 +28,6 @@ resource "kubectl_manifest" "es_cluster" {
     namespace                  = var.namespace
     node_sets                  = var.node_sets
     global_config              = var.global_config
-    secure_settings            = var.secure_settings
     update_strategy            = var.update_strategy
     http                       = var.http
   })
