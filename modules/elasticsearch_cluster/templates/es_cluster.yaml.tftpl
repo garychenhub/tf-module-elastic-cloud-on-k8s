@@ -9,11 +9,11 @@ spec:
   image: ${es_image}
 %{ endif ~}
   volumeClaimDeletePolicy: ${volume_claim_delete_policy}
-%{ if http != null ~}
+%{ if http != null && http.service != null ~}
   http:
-%{ if http.service != null ~}
     service:
 %{ if http.service.metadata != null ~}
+%{ if (lookup(http.service.metadata, "labels", null) != null && length(http.service.metadata.labels) > 0) || (lookup(http.service.metadata, "annotations", null) != null && length(http.service.metadata.annotations) > 0) ~}
       metadata:
 %{ if lookup(http.service.metadata, "labels", null) != null && length(http.service.metadata.labels) > 0 ~}
         labels:
@@ -28,24 +28,20 @@ spec:
 %{ endfor ~}
 %{ endif ~}
 %{ endif ~}
-%{ if http.service.spec != null ~}
+%{ endif ~}
+%{ if http.service.spec != null && http.service.spec.type != null ~}
       spec:
-%{ if http.service.spec.type != null ~}
         type: ${http.service.spec.type}
 %{ endif ~}
 %{ endif ~}
-%{ endif ~}
-%{ endif ~}
-%{ if update_strategy != null ~}
+%{ if update_strategy != null && update_strategy.change_budget != null ~}
   updateStrategy:
-%{ if update_strategy.change_budget != null ~}
     changeBudget:
 %{ if update_strategy.change_budget.max_surge != null ~}
       maxSurge: ${update_strategy.change_budget.max_surge}
 %{ endif ~}
 %{ if update_strategy.change_budget.max_unavailable != null ~}
       maxUnavailable: ${update_strategy.change_budget.max_unavailable}
-%{ endif ~}
 %{ endif ~}
 %{ endif ~}
   nodeSets:
