@@ -59,7 +59,7 @@
 # }
 
 resource "kubectl_manifest" "kibana" {
-  yaml_body = yamldecode(templatefile("${path.module}/templates/kibana.yaml.tftpl", {
+  yaml_body = templatefile("${path.module}/templates/kibana.yaml.tftpl", {
     kibana_name     = var.kibana_name
     namespace       = var.namespace
     kibana_version  = var.kibana_version
@@ -68,5 +68,5 @@ resource "kubectl_manifest" "kibana" {
     es_cluster_name = var.es_cluster_name
     es_namespace    = var.es_namespace != null ? var.es_namespace : var.namespace
     resources       = var.resources
-  }))
+  })
 }
