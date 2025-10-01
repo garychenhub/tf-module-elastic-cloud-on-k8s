@@ -72,24 +72,6 @@ variable "kibana_image" {
   default     = null
 }
 
-variable "image_pull_policy" {
-  type        = string
-  description = <<EOF
-    Image pull policy for Kibana containers.
-    
-    Possible values:
-    - Always: Always pull the image from the registry
-    - IfNotPresent: Pull the image only if it's not present locally (default)
-    - Never: Never pull the image from the registry
-    
-    See: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
-  EOF
-  default     = "IfNotPresent"
-  
-  validation {
-    condition     = contains(["Always", "IfNotPresent", "Never"], var.image_pull_policy)
-    error_message = "The image_pull_policy must be one of: Always, IfNotPresent, Never."
-  }
-}
+
 
 
