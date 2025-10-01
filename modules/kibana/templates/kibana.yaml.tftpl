@@ -14,14 +14,16 @@ spec:
 %{ if es_namespace != null && es_namespace != namespace ~}
     namespace: ${es_namespace}
 %{ endif ~}
+%{ if resources.requests.memory != "1Gi" || resources.requests.cpu != "0.5" || resources.limits.memory != "2.5Gi" || resources.limits.cpu != "2" ~}
   podTemplate:
     spec:
       containers:
-        - name: kibana
-          resources:
-            requests:
-              memory: ${resources.requests.memory}
-              cpu: ${resources.requests.cpu}
-            limits:
-              memory: ${resources.limits.memory}
-              cpu: ${resources.limits.cpu}
+      - name: kibana
+        resources:
+          requests:
+            cpu: ${resources.requests.cpu}
+            memory: ${resources.requests.memory}
+          limits:
+            cpu: ${resources.limits.cpu}
+            memory: ${resources.limits.memory}
+%{ endif ~}
