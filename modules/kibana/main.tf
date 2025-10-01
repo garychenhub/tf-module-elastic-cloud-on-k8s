@@ -19,6 +19,8 @@ resource "kubernetes_manifest" "kibana" {
     "metadata.resourceVersion",
     "metadata.uid",
     "metadata.creationTimestamp",
+    "metadata.deletionGracePeriodSeconds",
+    "metadata.deletionTimestamp",
 
     # PodTemplate metadata
     "spec.podTemplate.metadata",
