@@ -15,16 +15,16 @@ spec:
     service:
 %{ if http.service.metadata != null ~}
       metadata:
-%{ if length(http.service.metadata.labels) > 0 ~}
+%{ if lookup(http.service.metadata, "labels", null) != null && length(http.service.metadata.labels) > 0 ~}
         labels:
 %{ for key, value in http.service.metadata.labels ~}
           ${key}: "${value}"
 %{ endfor ~}
 %{ endif ~}
-%{ if length(http.service.metadata.annotations) > 0 ~}
+%{ if lookup(http.service.metadata, "annotations", null) != null && length(http.service.metadata.annotations) > 0 ~}
         annotations:
 %{ for key, value in http.service.metadata.annotations ~}
-          ${key}: "${value}"
+          ${key}: ${value}
 %{ endfor ~}
 %{ endif ~}
 %{ endif ~}
