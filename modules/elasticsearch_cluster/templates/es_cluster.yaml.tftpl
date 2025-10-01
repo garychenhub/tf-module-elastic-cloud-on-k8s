@@ -28,6 +28,12 @@ spec:
 %{ endfor ~}
 %{ endif ~}
 %{ endif ~}
+%{ if http.service.spec != null ~}
+      spec:
+%{ if http.service.spec.type != null ~}
+        type: ${http.service.spec.type}
+%{ endif ~}
+%{ endif ~}
 %{ endif ~}
 %{ endif ~}
 %{ if length(secure_settings) > 0 ~}
