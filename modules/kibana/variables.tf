@@ -110,9 +110,9 @@ variable "http" {
             app = "kibana"
           }
           annotations = {
-            "cloud.google.com/app-protocols"            = "{\"https\": \"HTTPS\"}"
-            "service.alpha.kubernetes.io/app-protocols" = "{\"https\": \"HTTPS\"}"
-            "cloud.google.com/neg"                      = "{\"ingress\": \"true\"}"
+            "cloud.google.com/app-protocols:"           = "'${jsonencode({ https = "HTTPS" })}'"
+            "service.alpha.kubernetes.io/app-protocols" = "'${jsonencode({ https = "HTTPS" })}'"
+            "cloud.google.com/neg"                      = "'${jsonencode({ ingress = "true" })}'"
           }
         }
         spec = {
