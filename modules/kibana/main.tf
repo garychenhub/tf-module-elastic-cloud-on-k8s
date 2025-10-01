@@ -1,13 +1,13 @@
 resource "kubernetes_manifest" "kibana" {
   manifest = yamldecode(templatefile("${path.module}/templates/kibana.yaml.tftpl", {
-    kibana_name       = var.kibana_name
-    namespace         = var.namespace
-    kibana_version    = var.kibana_version
-    kibana_image      = var.kibana_image
-    replicas          = var.replicas
-    es_cluster_name   = var.es_cluster_name
-    es_namespace      = var.es_namespace != null ? var.es_namespace : var.namespace
-    resources         = var.resources
+    kibana_name     = var.kibana_name
+    namespace       = var.namespace
+    kibana_version  = var.kibana_version
+    kibana_image    = var.kibana_image
+    replicas        = var.replicas
+    es_cluster_name = var.es_cluster_name
+    es_namespace    = var.es_namespace != null ? var.es_namespace : var.namespace
+    resources       = var.resources
   }))
 
   computed_fields = [
@@ -37,10 +37,19 @@ resource "kubernetes_manifest" "kibana" {
     "status.observedGeneration"
   ]
 
-  field_manager {
-    name            = "terraform"
-    force_conflicts = true
-  }
+  # computed_fields = [
+  #   "metadata.labels",
+  #   "metadata.annotations",
+  #   "spec.finalizers",
+  #   "spec.nodeSets",
+  #   "spec.podTemplate",
+  #   "status"
+  # ]
+
+  # field_manager {
+  #   name            = "terraform"
+  #   force_conflicts = true
+  # }
 
   wait {
     fields = {
