@@ -10,7 +10,6 @@
 #     global_config              = var.global_config
 #     secure_settings            = var.secure_settings
 #     update_strategy            = var.update_strategy
-#     security_context           = var.security_context
 #   }))
 #
 #   field_manager {
@@ -31,6 +30,5 @@ resource "kubectl_manifest" "es_cluster" {
     global_config              = var.global_config
     secure_settings            = var.secure_settings
     update_strategy            = var.update_strategy
-    security_context           = var.security_context
   })
 }

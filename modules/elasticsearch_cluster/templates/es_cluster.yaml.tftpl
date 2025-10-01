@@ -60,15 +60,6 @@ spec:
 %{ endif ~}
       podTemplate:
         spec:
-          securityContext:
-            allowPrivilegeEscalation: ${security_context.allow_privilege_escalation}
-            capabilities:
-              drop:
-%{ for capability in security_context.capabilities.drop ~}
-              - ${capability}
-%{ endfor ~}
-            privileged: ${security_context.privileged}
-            readOnlyRootFilesystem: ${security_context.read_only_root_filesystem}
           containers:
             - name: elasticsearch
               imagePullPolicy: ${image_pull_policy}
