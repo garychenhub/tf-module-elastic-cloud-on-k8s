@@ -8,5 +8,6 @@ resource "kubectl_manifest" "kibana" {
     es_cluster_name = var.es_cluster_name
     es_namespace    = var.es_namespace != null ? var.es_namespace : var.namespace
     resources       = var.resources
+    http            = var.http
   })
 }

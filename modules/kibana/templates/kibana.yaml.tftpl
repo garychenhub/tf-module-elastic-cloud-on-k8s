@@ -14,6 +14,33 @@ spec:
 %{ if es_namespace != null && es_namespace != namespace ~}
     namespace: ${es_namespace}
 %{ endif ~}
+%{ if http != null ~}
+  http:
+%{ if http.service != null ~}
+    service:
+%{ if http.service.metadata != null ~}
+      metadata:
+%{ if lookup(http.service.metadata, "labels", null) != null && length(http.service.metadata.labels) > 0 ~}
+        labels:
+%{ for key, value in http.service.metadata.labels ~}
+          ${key}: "${value}"
+%{ endfor ~}
+%{ endif ~}
+%{ if lookup(http.service.metadata, "annotations", null) != null && length(http.service.metadata.annotations) > 0 ~}
+        annotations:
+%{ for key, value in http.service.metadata.annotations ~}
+          ${key}: ${value}
+%{ endfor ~}
+%{ endif ~}
+%{ endif ~}
+%{ if http.service.spec != null ~}
+      spec:
+%{ if http.service.spec.type != null ~}
+        type: ${http.service.spec.type}
+%{ endif ~}
+%{ endif ~}
+%{ endif ~}
+%{ endif ~}
   podTemplate:
     spec:
       containers:

@@ -72,6 +72,54 @@ variable "kibana_image" {
   default     = null
 }
 
-
-
-
+variable "http" {
+  type = object({
+    service = optional(object({
+      metadata = optional(object({
+        labels      = optional(map(string), {})
+        annotations = optional(map(string), {})
+      }), {})
+      spec = optional(object({
+        type = optional(string)
+      }), {})
+    }), {})
+  })
+  description = <<EOF
+    HTTP service configuration for Kibana.
+    
+    - service.metadata.labels: Custom labels to apply to the HTTP service
+    - service.metadata.annotations: Custom annotations to apply to the HTTP service
+    - service.spec.type: Kubernetes service type (ClusterIP, LoadBalancer, NodePort)
+    
+    Examples:
+    
+    For LoadBalancer (public access):
+    {
+      service = {
+        spec = {
+          type = "LoadBalancer"
+        }
+      }
+    }
+    
+    For Google Cloud Load Balancer with annotations:
+    {
+      service = {
+        metadata = {
+          labels = {
+            app = "kibana"
+          }
+          annotations = {
+            "cloud.google.com/app-protocols"            = "{\"https\": \"HTTPS\"}"
+            "service.alpha.kubernetes.io/app-protocols" = "{\"https\": \"HTTPS\"}"
+            "cloud.google.com/neg"                      = "{\"ingress\": \"true\"}"
+          }
+        }
+        spec = {
+          type = "LoadBalancer"
+        }
+      }
+    }
+  EOF
+  default = null
+}
