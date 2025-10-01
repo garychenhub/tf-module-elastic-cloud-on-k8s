@@ -9,6 +9,27 @@ spec:
   image: ${es_image}
 %{ endif ~}
   volumeClaimDeletePolicy: ${volume_claim_delete_policy}
+%{ if http != null ~}
+  http:
+%{ if http.service != null ~}
+    service:
+%{ if http.service.metadata != null ~}
+      metadata:
+%{ if length(http.service.metadata.labels) > 0 ~}
+        labels:
+%{ for key, value in http.service.metadata.labels ~}
+          ${key}: ${value}
+%{ endfor ~}
+%{ endif ~}
+%{ if length(http.service.metadata.annotations) > 0 ~}
+        annotations:
+%{ for key, value in http.service.metadata.annotations ~}
+          ${key}: ${value}
+%{ endfor ~}
+%{ endif ~}
+%{ endif ~}
+%{ endif ~}
+%{ endif ~}
 %{ if length(secure_settings) > 0 ~}
   secureSettings:
 %{ for setting in secure_settings ~}

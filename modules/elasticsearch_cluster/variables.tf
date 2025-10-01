@@ -141,9 +141,43 @@ variable "image_pull_policy" {
     See: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
   EOF
   default     = "IfNotPresent"
-
+  
   validation {
     condition     = contains(["Always", "IfNotPresent", "Never"], var.image_pull_policy)
     error_message = "The image_pull_policy must be one of: Always, IfNotPresent, Never."
   }
+}
+
+variable "http" {
+  type = object({
+    service = optional(object({
+      metadata = optional(object({
+        labels      = optional(map(string), {})
+        annotations = optional(map(string), {})
+      }), {})
+    }), {})
+  })
+  description = <<EOF
+    HTTP service configuration for Elasticsearch cluster.
+    
+    - service.metadata.labels: Custom labels to apply to the HTTP service
+    - service.metadata.annotations: Custom annotations to apply to the HTTP service
+    
+    Example for Google Cloud Load Balancer:
+    {
+      service = {
+        metadata = {
+          labels = {
+            app = "elasticsearch"
+          }
+          annotations = {
+            "cloud.google.com/app-protocols" = '{"https":"HTTPS"}'
+            "service.alpha.kubernetes.io/app-protocols" = '{"https":"HTTPS"}'
+            "cloud.google.com/neg" = '{"ingress": true}'
+          }
+        }
+      }
+    }
+  EOF
+  default = null
 }
