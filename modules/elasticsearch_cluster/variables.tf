@@ -177,3 +177,43 @@ variable "http" {
   EOF
   default = null
 }
+
+variable "automount_service_account_token" {
+  type        = bool
+  description = <<EOF
+    Indicates whether pods should automatically mount a ServiceAccount token.
+    
+    This is required for features like:
+    - GKE Workload Identity for Google Cloud Storage snapshots
+    - AWS IAM roles for service accounts (IRSA) for S3 snapshots
+    - Azure Workload Identity for Azure blob storage snapshots
+    
+    When set to true, the ServiceAccount token will be automatically mounted 
+    in the pod, allowing Elasticsearch to authenticate with cloud services.
+    
+    See: https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore/cloud-on-k8s
+  EOF
+  default     = false
+}
+
+variable "service_account_name" {
+  type        = string
+  description = <<EOF
+    Name of the Kubernetes ServiceAccount to use for the Elasticsearch pods.
+    
+    This ServiceAccount should be configured with appropriate permissions for:
+    - GKE Workload Identity (annotated with iam.gke.io/gcp-service-account)
+    - AWS IAM roles for service accounts (IRSA)
+    - Azure Workload Identity
+    
+    Examples:
+    - "gcs-sa" for Google Cloud Storage with Workload Identity
+    - "aws-sa" for AWS S3 with IRSA
+    - "workload-identity-sa" for Azure Workload Identity
+    
+    If not specified, the default ServiceAccount will be used.
+    
+    See: https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore/cloud-on-k8s
+  EOF
+  default     = null
+}

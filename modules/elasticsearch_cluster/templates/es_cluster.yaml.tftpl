@@ -68,6 +68,12 @@ spec:
 %{ endif ~}
       podTemplate:
         spec:
+%{ if automount_service_account_token ~}
+          automountServiceAccountToken: ${automount_service_account_token}
+%{ endif ~}
+%{ if service_account_name != null ~}
+          serviceAccountName: ${service_account_name}
+%{ endif ~}
           containers:
             - name: elasticsearch
               imagePullPolicy: ${image_pull_policy}
