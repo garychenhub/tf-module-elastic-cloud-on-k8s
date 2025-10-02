@@ -1,14 +1,18 @@
+# Kibana Module
+
+This module creates a Kibana instance using the Elastic Cloud on Kubernetes (ECK) operator.
+
 ## Requirements
 
 The following requirements are needed by this module:
 
-- <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) (~> 2.0)
+- kubectl (~> 1.19.0)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) (~> 2.0)
+- kubectl (~> 1.19.0)
 
 ## Modules
 
@@ -18,31 +22,31 @@ No modules.
 
 The following resources are used by this module:
 
-- [kubernetes_manifest.kibana](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) (resource)
+- [kubectl_manifest.kibana](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) (resource)
 
 ## Required Inputs
 
 The following input variables are required:
 
-### <a name="input_es_cluster_name"></a> [es\_cluster\_name](#input\_es\_cluster\_name)
+### es_cluster_name
 
 Description: The name of the Elasticsearch cluster to connect to.
 
 Type: `string`
 
-### <a name="input_kibana_name"></a> [kibana\_name](#input\_kibana\_name)
+### kibana_name
 
-Description: The name of the Kibana.
-
-Type: `string`
-
-### <a name="input_kibana_version"></a> [kibana\_version](#input\_kibana\_version)
-
-Description: The version of the Kibana.
+Description: The name of the Kibana instance.
 
 Type: `string`
 
-### <a name="input_namespace"></a> [namespace](#input\_namespace)
+### kibana_version
+
+Description: The version of Kibana to deploy.
+
+Type: `string`
+
+### namespace
 
 Description: The namespace to deploy Kibana.
 
@@ -52,7 +56,7 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
-### <a name="input_es_namespace"></a> [es\_namespace](#input\_es\_namespace)
+### es_namespace
 
 Description: The namespace where the Elasticsearch cluster is deployed. If not specified, defaults to the same namespace as Kibana.
 
@@ -60,90 +64,184 @@ Type: `string`
 
 Default: `null`
 
-### <a name="input_replicas"></a> [replicas](#input\_replicas)
+### http
 
-Description: The number of Kibana.
+Description: HTTP service configuration for Kibana.
 
-Type: `number`
+- service.metadata.labels: Custom labels to apply to the HTTP service
+- service.metadata.annotations: Custom annotations to apply to the HTTP service
+- service.spec.type: Kubernetes service type (ClusterIP, LoadBalancer, NodePort)
 
-Default: `1`
+Examples:
 
-### <a name="input_resources"></a> [resources](#input\_resources)
+For LoadBalancer (public access):
 
-Description: Compute resource requirements for the Kibana container.
-Based on official ECK recommendations:
-- requests: Minimum resources required for scheduling (memory: 1Gi, cpu: 0.5)
-- limits: Maximum resources the container can use (memory: 2.5Gi, cpu: 2)
+```hcl
+{
+  service = {
+    spec = {
+      type = "LoadBalancer"
+    }
+  }
+}
+```
 
-Note: ECK applies a default memory limit of 1Gi if not specified.
-For production workloads, consider setting limits to ensure QoS.
+For Google Cloud Load Balancer with annotations:
 
-See: https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/manage-compute-resources
+```hcl
+{
+  service = {
+    metadata = {
+      labels = {
+        app = "kibana"
+      }
+      annotations = {
+        "cloud.google.com/app-protocols:"           = "'${jsonencode({ https = "HTTPS" })}'"
+        "service.alpha.kubernetes.io/app-protocols" = "'${jsonencode({ https = "HTTPS" })}'"
+        "cloud.google.com/neg"                      = "'${jsonencode({ ingress = "true" })}'"
+      }
+    }
+    spec = {
+      type = "LoadBalancer"
+    }
+  }
+}
+```
 
 Type:
 
 ```hcl
 object({
-    requests = optional(object({
-      memory = optional(string, "1Gi")
-      cpu    = optional(string, "0.5")
+  service = optional(object({
+    metadata = optional(object({
+      labels      = optional(map(string), {})
+      annotations = optional(map(string), {})
     }), {})
-    limits = optional(object({
-      memory = optional(string, "2.5Gi")
-      cpu    = optional(string, "2")
+    spec = optional(object({
+      type = optional(string)
     }), {})
+  }), {})
+})
+```
+
+Default: `null`
+
+### kibana_image
+
+Description: Custom Kibana Docker image. If not specified, the default Kibana image will be used.
+
+Type: `string`
+
+Default: `null`
+
+### replicas
+
+Description: The number of Kibana replicas.
+
+Type: `number`
+
+Default: `1`
+
+### resources
+
+Description: Compute resource requirements for the Kibana container.
+
+Based on official ECK recommendations:
+
+- requests: Minimum resources required for scheduling
+- limits: Maximum resources the container can use
+
+Note: ECK applies a default memory limit of 1Gi if not specified. For production workloads, consider setting limits to ensure QoS.
+
+See: <https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/manage-compute-resources>
+
+Type:
+
+```hcl
+object({
+  requests = object({
+    memory = string
+    cpu    = string
   })
+  limits = object({
+    memory = string
+    cpu    = string
+  })
+})
 ```
 
 Default:
 
 ```hcl
 {
-  limits = {
-    cpu = "2"
-    memory = "2.5Gi"
-  }
   requests = {
-    cpu = "0.5"
     memory = "1Gi"
+    cpu    = "0.5"
+  }
+  limits = {
+    memory = "2.5Gi"
+    cpu    = "2"
   }
 }
 ```
 
-### <a name="input_secure_settings"></a> [secure\_settings](#input\_secure\_settings)
-
-Description: List of secure settings to be injected into Kibana keystore from Kubernetes secrets.
-Each object should contain:
-- secret\_name: Name of the Kubernetes secret containing the secure settings
-- entries: Optional list of specific entries to project from the secret
-  - key: The key in the secret to project
-  - path: Optional custom path in the keystore (defaults to the key name)
-
-If entries is empty or not specified, all keys from the secret will be projected
-using their original names as keystore paths.
-
-Type:
-
-```hcl
-list(object({
-    secret_name = string
-    entries = optional(list(object({
-      key  = string
-      path = optional(string)
-    })), [])
-  }))
-```
-
-Default: `[]`
-
-### <a name="input_kibana_image"></a> [kibana\_image](#input\_kibana\_image)
-
-Description: Custom Kibana Docker image to use. If not specified, the default Kibana image will be used.
-
-Type: `string`
-
-Default: `null`
-
 ## Outputs
 
 No outputs.
+
+## Example Usage
+
+### Basic Example
+
+```hcl
+module "kibana" {
+  source = "./modules/kibana"
+
+  kibana_name     = "my-kibana"
+  kibana_version  = "8.16.1"
+  namespace       = "elastic-system"
+  es_cluster_name = "my-elasticsearch"
+}
+```
+
+### With LoadBalancer and Custom Resources
+
+```hcl
+module "kibana" {
+  source = "./modules/kibana"
+
+  kibana_name     = "my-kibana"
+  kibana_version  = "8.16.1"
+  namespace       = "elastic-system"
+  es_cluster_name = "my-elasticsearch"
+
+  # Enable LoadBalancer with GCP annotations
+  http = {
+    service = {
+      metadata = {
+        annotations = {
+          "cloud.google.com/app-protocols"            = "{\"https\": \"HTTPS\"}"
+          "service.alpha.kubernetes.io/app-protocols" = "{\"https\": \"HTTPS\"}"
+          "cloud.google.com/neg"                      = "{\"ingress\": \"true\"}"
+        }
+      }
+      spec = {
+        type = "LoadBalancer"
+      }
+    }
+  }
+
+  # Custom resource allocation
+  resources = {
+    requests = {
+      memory = "2Gi"
+      cpu    = "1"
+    }
+    limits = {
+      memory = "4Gi"
+      cpu    = "2"
+    }
+  }
+
+  replicas = 2
+}

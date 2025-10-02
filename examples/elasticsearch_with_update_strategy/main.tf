@@ -1,7 +1,10 @@
-# 範例：使用 Update Strategy 的 Elasticsearch 集群
-# 此範例展示如何配置 Elasticsearch 集群的更新策略以控制 Pod 的同時變更數量
+# Example: Elasticsearch cluster with Update Strategy
+# This example demonstrates how to configure Elasticsearch cluster update strategies to co      # -1 means unlimited (default behavior)
+#      max_surge = -1
 
-# 使用 Update Strategy 的 Elasticsearch 集群
+      # Allow more Pods to be unavailable simultaneously, speeding up updatesl the number of simultaneous Pod changes
+
+# Elasticsearch cluster with Update Strategy
 module "elasticsearch_cluster_with_update_strategy" {
   source = "../../modules/elasticsearch_cluster"
 
@@ -76,22 +79,22 @@ module "elasticsearch_cluster_with_update_strategy" {
     }
   ]
 
-  # 配置 Update Strategy
-  # 這個設定限制了同時更新的 Pod 數量，確保集群穩定性
+  # Configure Update Strategy
+  # This setting limits the number of Pods updated simultaneously, ensuring cluster stability
   update_strategy = {
     change_budget = {
-      # 最多允許同時創建 3 個額外的 Pod
-      # 這在 nodeSet 配置變更時控制資源使用
+      # Allow up to 3 additional Pods to be created simultaneously
+      # This controls resource usage when nodeSet configurations change
       max_surge = 3
 
-      # 最多允許同時有 2 個 Pod 不可用
-      # 確保集群在更新過程中保持足夠的可用節點
+      # Allow up to 2 Pods to be unavailable simultaneously
+      # Ensures the cluster maintains sufficient available nodes during updates
       max_unavailable = 2
     }
   }
 }
 
-# 範例：保守的更新策略（適用於生產環境）
+# Example: Conservative update strategy (suitable for production environments)
 module "elasticsearch_cluster_conservative" {
   source = "../../modules/elasticsearch_cluster"
 
@@ -109,19 +112,19 @@ module "elasticsearch_cluster_conservative" {
     }
   ]
 
-  # 保守的更新策略：一次只更新一個 Pod，避免創建額外 Pod
+  # Conservative update strategy: update only one Pod at a time, avoid creating extra Pods
   update_strategy = {
     change_budget = {
-      # 不允許創建額外的 Pod，節省資源
+      # Do not allow creating extra Pods, saving resources
       max_surge = 0
 
-      # 一次只允許一個 Pod 不可用，確保最大穩定性
+      # Only allow one Pod to be unavailable at a time, ensuring maximum stability
       max_unavailable = 1
     }
   }
 }
 
-# 範例：快速更新策略（適用於開發環境）
+# Example: Fast update strategy (suitable for development environments)
 module "elasticsearch_cluster_fast" {
   source = "../../modules/elasticsearch_cluster"
 
@@ -139,10 +142,10 @@ module "elasticsearch_cluster_fast" {
     }
   ]
 
-  # 快速更新策略：允許無限制的額外 Pod 和多個 Pod 同時不可用
+  # Fast update strategy: allow unlimited extra Pods and multiple Pods to be unavailable simultaneously
   update_strategy = {
     change_budget = {
-      # -1 表示無限制（默認行為）
+      # -1 means unlimited (default behavior)
       max_surge = -1
 
       # 允許更多 Pod 同時不可用，加快更新速度

@@ -1,7 +1,7 @@
-# 範例：不同資源配置的 Kibana 部署
-# 此範例展示如何為不同使用場景配置 Kibana 資源
+# Example: Kibana deployment with different resource configurations
+# This example demonstrates how to configure Kibana resources for different use cases
 
-# 開發環境 - 最小資源配置
+# Development environment - minimal resource configuration
 module "kibana_dev" {
   source = "../../modules/kibana"
 
@@ -11,7 +11,7 @@ module "kibana_dev" {
   replicas        = 1
   es_cluster_name = var.es_cluster_name
 
-  # 開發環境的輕量配置
+  # Lightweight configuration for development environment
   resources = {
     requests = {
       memory = "512Mi"
@@ -24,7 +24,7 @@ module "kibana_dev" {
   }
 }
 
-# 生產環境 - 標準配置（官方建議）
+# Production environment - standard configuration (official recommendation)
 module "kibana_prod" {
   source = "../../modules/kibana"
 
@@ -34,7 +34,7 @@ module "kibana_prod" {
   replicas        = 2
   es_cluster_name = var.es_cluster_name
 
-  # 生產環境標準配置
+  # Standard production environment configuration
   resources = {
     requests = {
       memory = "1Gi"
@@ -47,7 +47,7 @@ module "kibana_prod" {
   }
 }
 
-# 高負載環境 - 高資源配置
+# High-load environment - high resource configuration
 module "kibana_high_load" {
   source = "../../modules/kibana"
 
@@ -57,7 +57,7 @@ module "kibana_high_load" {
   replicas        = 3
   es_cluster_name = var.es_cluster_name
 
-  # 高負載環境配置
+  # High-load environment configuration
   resources = {
     requests = {
       memory = "2Gi"
@@ -70,7 +70,7 @@ module "kibana_high_load" {
   }
 }
 
-# Guaranteed QoS - requests 和 limits 相同
+# Guaranteed QoS - requests and limits are identical
 module "kibana_guaranteed_qos" {
   source = "../../modules/kibana"
 
@@ -80,15 +80,15 @@ module "kibana_guaranteed_qos" {
   replicas        = 1
   es_cluster_name = var.es_cluster_name
 
-  # Guaranteed QoS 配置
+  # Guaranteed QoS configuration
   resources = {
     requests = {
       memory = "2Gi"
       cpu    = "1"
     }
     limits = {
-      memory = "2Gi" # 與 requests 相同
-      cpu    = "1"   # 與 requests 相同
+      memory = "2Gi" # Same as requests
+      cpu    = "1"   # Same as requests
     }
   }
 }

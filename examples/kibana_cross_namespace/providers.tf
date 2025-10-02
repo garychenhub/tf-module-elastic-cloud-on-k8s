@@ -10,6 +10,6 @@ terraform {
 }
 
 provider "kubernetes" {
-  # 配置您的 Kubernetes 提供者設定
-  # 例如：config_path = "~/.kube/config"
+  # Configure your Kubernetes provider settings
+  # For example: config_path = "~/.kube/config"
 }

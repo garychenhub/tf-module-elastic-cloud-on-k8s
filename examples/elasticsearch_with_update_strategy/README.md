@@ -1,33 +1,33 @@
-# Elasticsearch with Update Strategy 範例
+# Elasticsearch with Update Strategy Example
 
-此範例展示如何在 Terraform 中配置 Elasticsearch 集群的更新策略，以控制 Pod 在更新過程中的同時變更數量。
+This example demonstrates how to configure Elasticsearch cluster update strategies in Terraform to control the number of simultaneous Pod changes during updates.
 
-## 功能特色
+## Features
 
-- 展示三種不同的更新策略配置
-- 控制資源使用和集群穩定性
-- 適用於不同環境的最佳實踐
+- Demonstrates three different update strategy configurations
+- Controls resource usage and cluster stability
+- Best practices for different environments
 
-## 更新策略說明
+## Update Strategy Explanation
 
-### 1. 標準更新策略
-適用於大多數生產環境：
-- `maxSurge: 3` - 最多同時創建 3 個額外 Pod
-- `maxUnavailable: 2` - 最多同時有 2 個 Pod 不可用
+### 1. Standard Update Strategy
+Suitable for most production environments:
+- `maxSurge: 3` - Allow up to 3 additional Pods to be created simultaneously
+- `maxUnavailable: 2` - Allow up to 2 Pods to be unavailable simultaneously
 
-### 2. 保守更新策略
-適用於資源受限或高穩定性要求的環境：
-- `maxSurge: 0` - 不創建額外 Pod，節省資源
-- `maxUnavailable: 1` - 一次只更新一個 Pod，確保最大穩定性
+### 2. Conservative Update Strategy
+Suitable for resource-constrained or high-stability environments:
+- `maxSurge: 0` - No extra Pods created, saving resources
+- `maxUnavailable: 1` - Update only one Pod at a time, ensuring maximum stability
 
-### 3. 快速更新策略
-適用於開發環境或需要快速更新的場景：
-- `maxSurge: -1` - 無限制創建額外 Pod（默認行為）
-- `maxUnavailable: 2` - 允許更多 Pod 同時不可用
+### 3. Fast Update Strategy
+Suitable for development environments or scenarios requiring rapid updates:
+- `maxSurge: -1` - Unlimited extra Pod creation (default behavior)
+- `maxUnavailable: 2` - Allow more Pods to be unavailable simultaneously
 
-## 使用場景
+## Use Cases
 
-### 適用於使用 Update Strategy 的情況：
+### When to use Update Strategy:
 
 1. **大型集群**：避免同時創建過多 Pod 造成資源短缺
 2. **資源受限環境**：控制資源使用，避免影響其他工作負載
