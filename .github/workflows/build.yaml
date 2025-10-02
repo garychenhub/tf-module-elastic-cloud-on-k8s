@@ -1,0 +1,131 @@
+name: Docker Build
+
+on:
+  push:
+    branches:
+      - "feature/*"
+      - "main"
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  RUN_NUMBER: ${{ github.run_number }}
+  ES_VERSION: "9.1.4"
+  GCLOUD_VERSION: "514.0.0"
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+  GCR_REGISTRY: "asia-northeast1-docker.pkg.dev"
+  DOCKER_FILE: "docker/Dockerfile"
+  IMAGE_NAME: "infra-docker-elasticsearch"
+
+jobs:
+  build:
+    name: Build
+    runs-on: linktivity-workload-runner
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+
+      - name: 'Get Project Number'
+        env:
+          ENV_SUFFIX: ${{ contains(fromJSON('["prod", "stg"]'), inputs.env) && 'prod' || 'dev' }}
+        run: |
+          PROJECT_NAME=$(basename $(pwd) | tr '[:upper:]' '[:lower:]')
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
+          
+          PROJECT_ID="lkty-core-s-dev"
+          echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
+          
+          PROJECT_NUMBER=$(echo '${{ vars.GCP_PROJECT_MAPPING }}' | jq -r --arg id "$PROJECT_ID" '.[$id]')
+          echo "PROJECT_NUMBER=$PROJECT_NUMBER" >> $GITHUB_ENV
+
+      - name: 'Set up image repo and tag'
+        run: |          
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            IMAGE_TAG="${{ github.ref_name }}"
+          else
+            BRANCH_NAME="${{ github.ref }}"
+            BRANCH_NAME="${BRANCH_NAME#refs/heads/}"
+            BRANCH_NAME="${BRANCH_NAME//\//-}"
+            SHORT_SHA=$(git rev-parse --short ${{ github.sha }})
+            IMAGE_TAG="${BRANCH_NAME}-${SHORT_SHA}"
+          fi
+          
+          echo "IMAGE_REPO=asia-northeast1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: 'Preset environment variables'
+        if: runner.environment == 'self-hosted'
+        run: |
+          echo "RUNNER_TOOL_CACHE=/home/runner/_work/_tool" >> $GITHUB_ENV
+
+      - name: 'Set up Docker Buildx remote driver'
+        if: runner.environment == 'self-hosted'
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+          driver: 'remote'
+          endpoint: "tcp://kube.buildkit:1234"
+
+      - name: 'Set up Docker Buildx local driver'
+        if: runner.environment == 'github-hosted'
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+          driver: 'docker-container'
+          driver-opts: |
+            network=host
+            image=moby/buildkit:latest
+
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          token_format: 'access_token'
+          workload_identity_provider: 'projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/oidc-pool/providers/github-actions'
+          service_account: 'infra-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+
+      - name: 'Ignore gha-creds in local repo'
+        run: echo "gha-creds*" >> .git/info/exclude
+
+      - name: 'Cache gcloud SDK'
+        if: runner.environment == 'github-hosted'
+        id: cache-gcloud
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.RUNNER_TOOL_CACHE }}/gcloud/
+          key: ${{ runner.os }}-gcloud-${{ env.GCLOUD_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-gcloud-
+
+      - name: 'Set up gcloud'
+        if: runner.environment == 'github-hosted' && steps.cache-gcloud.outputs.cache-hit != 'true'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: ${{ env.GCLOUD_VERSION }}
+          project_id: ${{ env.PROJECT_ID }}
+          install_components: 'gke-gcloud-auth-plugin,kubectl'
+
+      - name: 'Add gcloud bin to PATH if cache hit'
+        if: runner.environment == 'github-hosted' && steps.cache-gcloud.outputs.cache-hit == 'true'
+        run: echo "${{ env.RUNNER_TOOL_CACHE }}/gcloud/${{ env.GCLOUD_VERSION }}/x64/bin" >> $GITHUB_PATH
+
+      - name: Configure authentication to GCR
+        run: |
+          gcloud auth configure-docker $GCR_REGISTRY -q
+
+      - name: 'Build Docker image'
+        run: |
+          echo "Building $IMAGE_REPO:$IMAGE_TAG..."
+          docker buildx build \
+            --file $DOCKER_FILE \
+            --tag $IMAGE_REPO:$IMAGE_TAG \
+            --platform linux/amd64 \
+            --build-arg ES_VERSION=$ES_VERSION \
+            --output type=registry,ref=$IMAGE_REPO:$IMAGE_TAG \
+            $DOCKER_FILE

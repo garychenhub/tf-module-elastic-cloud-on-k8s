@@ -1,0 +1,147 @@
+# Git files
+.git
+.gitignore
+
+# Documentation (keep essential docs)
+*.md
+!README.md
+docs/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+Desktop.ini
+$RECYCLE_BIN/
+
+# Development and testing files
+tests/
+test/
+spec/
+*.test.js
+*.spec.js
+coverage/
+.nyc_output
+
+# CI/CD files (GitHub Actions not needed in image)
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+Jenkinsfile
+azure-pipelines.yml
+
+# Build tools and configuration
+Makefile
+package.json
+package-lock.json
+yarn.lock
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# Docker development files
+docker-compose.yml
+docker-compose.*.yml
+.dockerignore
+Dockerfile.dev
+Dockerfile.test
+
+# Environment and configuration files
+.env
+.env.*
+config.local.json
+settings.local.json
+.envrc
+
+# Logs and temporary files
+logs/
+*.log
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+
+# Security and certificates (if not needed)
+*.pem
+*.key
+*.crt
+*.cert
+trivy-results.sarif
+security-report.json
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Cache directories
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
+
+# Build artifacts
+build/
+dist/
+target/
+out/
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# Archive files (unless specifically needed)
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.rar
+*.7z
+
+# Local development overrides
+*.local
+local/
+
+# Elasticsearch data directories (not needed in image)
+esdata/
+elasticsearch-data/
+data/elasticsearch/
+
+# License files (keep if needed for compliance)
+# LICENSE
+# COPYING
+
+# Scripts that might contain sensitive data
+scripts/
+*.sh
+!entrypoint.sh
+!docker-entrypoint.sh
+
+# Sample and example files
+examples/
+samples/
+demo/
+
+# Development dependencies
+devDependencies/
