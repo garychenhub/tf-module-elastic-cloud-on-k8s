@@ -164,9 +164,9 @@ variable "http" {
             app = "elasticsearch"
           }
           annotations = {
-            "cloud.google.com/app-protocols:"           = "'${jsonencode({ https = "HTTPS" })}'"
-            "service.alpha.kubernetes.io/app-protocols" = "'${jsonencode({ https = "HTTPS" })}'"
-            "cloud.google.com/neg"                      = "'${jsonencode({ ingress = "true" })}'"
+            "cloud.google.com/app-protocols:"           = "'$${jsonencode({ https = "HTTPS" })}'"
+            "service.alpha.kubernetes.io/app-protocols" = "'$${jsonencode({ https = "HTTPS" })}'"
+            "cloud.google.com/neg"                      = "'$${jsonencode({ ingress = "true" })}'"
           }
         }
         spec = {
