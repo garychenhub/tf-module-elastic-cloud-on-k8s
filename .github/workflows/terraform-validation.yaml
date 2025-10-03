@@ -1,0 +1,229 @@
+name: Terraform Validation (Smart)
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - "**.tf"
+      - "**.tfvars"
+      - ".github/workflows/terraform-validation-smart.yaml"
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "**.tf"
+      - "**.tfvars"
+
+env:
+  TERRAFORM_VERSION: "1.9.0"
+
+jobs:
+  find-changed-modules:
+    name: Find Changed Modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.find-modules.outputs.modules }}
+      has_changes: ${{ steps.find-modules.outputs.has_changes }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 獲取完整的 git 歷史以便比較差異
+
+      - name: Find changed Terraform modules
+        id: find-modules
+        run: |
+          # If PR, compare PR base branch with head branch
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BASE_REF="${{ github.event.pull_request.base.sha }}"
+            HEAD_REF="${{ github.event.pull_request.head.sha }}"
+          else
+            # If push, compare with previous commit
+            BASE_REF="${{ github.event.before }}"
+            HEAD_REF="${{ github.sha }}"
+          fi
+          
+          echo "Comparing $BASE_REF...$HEAD_REF"
+          
+          # Find all changed .tf files
+          CHANGED_FILES=$(git diff --name-only $BASE_REF $HEAD_REF | grep '\.tf
+
+  terraform-validate:
+    name: Validate ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    needs: find-changed-modules
+    if: needs.find-changed-modules.outputs.has_changes == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.find-changed-modules.outputs.modules) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Get module name
+        id: module-info
+        run: |
+          if [ "${{ matrix.module }}" == "." ]; then
+            MODULE_NAME="root"
+          else
+            MODULE_NAME=$(basename ${{ matrix.module }})
+          fi
+          echo "name=$MODULE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Terraform Format Check
+        id: fmt
+        working-directory: ${{ matrix.module }}
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        working-directory: ${{ matrix.module }}
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        id: validate
+        working-directory: ${{ matrix.module }}
+        run: terraform validate -no-color
+
+      - name: Post validation summary
+        if: always()
+        run: |
+          echo "### Validation Results for \`${{ steps.module-info.outputs.name }}\` (${{ matrix.module }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Format | ${{ steps.fmt.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Init | ${{ steps.init.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Validate | ${{ steps.validate.outcome }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check Status
+        if: steps.fmt.outcome == 'failure' || steps.init.outcome == 'failure' || steps.validate.outcome == 'failure'
+        run: exit 1
+
+  tflint:
+    name: TFLint ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    needs: find-changed-modules
+    if: needs.find-changed-modules.outputs.has_changes == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.find-changed-modules.outputs.modules) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: Check for TFLint config
+        id: check-config
+        run: |
+          # Check if .tflint.hcl exists in project root
+          if [ -f ".tflint.hcl" ]; then
+            echo "config_path=$(pwd)/.tflint.hcl" >> $GITHUB_OUTPUT
+            echo "has_config=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_config=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Init TFLint
+        if: steps.check-config.outputs.has_config == 'true'
+        working-directory: ${{ matrix.module }}
+        run: tflint --init --config ${{ steps.check-config.outputs.config_path }}
+
+      - name: Run TFLint with config
+        if: steps.check-config.outputs.has_config == 'true'
+        working-directory: ${{ matrix.module }}
+        run: tflint --config ${{ steps.check-config.outputs.config_path }} --format compact
+
+      - name: Run TFLint without config
+        if: steps.check-config.outputs.has_config == 'false'
+        working-directory: ${{ matrix.module }}
+        run: tflint --format compact
+
+  summary:
+    name: Validation Summary
+    runs-on: ubuntu-latest
+    needs: [find-changed-modules, terraform-validate, tflint]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## Terraform Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.find-changed-modules.outputs.has_changes }}" == "false" ]; then
+            echo "✅ No Terraform files changed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### Changed Modules" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo '${{ needs.find-changed-modules.outputs.modules }}' | jq -r '.[]' >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            echo "### Job Results" >> $GITHUB_STEP_SUMMARY
+            echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Terraform Validate | ${{ needs.terraform-validate.result }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| TFLint | ${{ needs.tflint.result }} |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No Terraform files changed"
+            echo "modules=[]" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "Changed Terraform files:"
+          echo "$CHANGED_FILES"
+          
+          # Find module directories containing the changed files
+          MODULES=$(echo "$CHANGED_FILES" | while read file; do
+            # Find the directory containing the file and search for the nearest parent directory with main.tf or versions.tf
+            dir=$(dirname "$file")
+            while [ "$dir" != "." ]; do
+              if [ -f "$dir/main.tf" ] || [ -f "$dir/versions.tf" ]; then
+                echo "$dir"
+                break
+              fi
+              dir=$(dirname "$dir")
+            done
+            # If no module directory found, might be root directory
+            if [ "$dir" == "." ] && ([ -f "main.tf" ] || [ -f "versions.tf" ]); then
+              echo "."
+            fi
+          done | sort -u)
+          
+          if [ -z "$MODULES" ]; then
+            echo "No modules found"
+            echo "modules=[]" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "Modules to validate:"
+          echo "$MODULES"
+          
+          # Convert to JSON array
+          MODULES_JSON=$(echo "$MODULES" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          
+          echo "modules=$MODULES_JSON" >> $GITHUB_OUTPUT
+          echo "has_changes=true" >> $GITHUB_OUTPUT
