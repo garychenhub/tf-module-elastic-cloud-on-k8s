@@ -11,8 +11,8 @@ on:
       - ".github/workflows/terraform-validation-smart.yaml"
   push:
     branches:
-      - main
-      - develop
+      - "master"
+      - "feature/*"
     paths:
       - "**.tf"
       - "**.tfvars"
