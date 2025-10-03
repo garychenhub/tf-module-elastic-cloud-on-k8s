@@ -1,4 +1,4 @@
-name: Terraform Validation (Smart)
+name: Terraform Validation
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
     paths:
       - "**.tf"
       - "**.tfvars"
-      - ".github/workflows/terraform-validation-smart.yaml"
+      - ".github/workflows/terraform-validation.yaml"
   push:
     branches:
       - "master"
@@ -16,6 +16,7 @@ on:
     paths:
       - "**.tf"
       - "**.tfvars"
+      - ".github/workflows/terraform-validation.yaml"
 
 env:
   TERRAFORM_VERSION: "1.9.0"
@@ -34,18 +35,28 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Find changed Terraform modules
-        id: find-modules
-        run: |
-          # Find all directories containing main.tf or versions.tf
-          # Exclude .terraform, .git, and examples directories
-          modules=$(find . -type f \( -name "main.tf" -o -name "versions.tf" \) \
-            -not -path "*/.terraform/*" \
-            -not -path "*/.git/*" \
-            -not -path "*/examples/*" | \
-            xargs -I {} dirname {} | \
-            sort -u | \
-            jq -R -s -c 'split("\n") | map(select(length > 0))')
+      - name: Find changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **.tf
+            modules/**
+          files_ignore: |
+            examples/**
+
+#      - name: Find changed Terraform modules
+#        id: find-modules
+#        run: |
+#          # Find all directories containing main.tf or versions.tf
+#          # Exclude .terraform, .git, and examples directories
+#          modules=$(find . -type f \( -name "main.tf" -o -name "versions.tf" \) \
+#            -not -path "*/.terraform/*" \
+#            -not -path "*/.git/*" \
+#            -not -path "*/examples/*" | \
+#            xargs -I {} dirname {} | \
+#            sort -u | \
+#            jq -R -s -c 'split("\n") | map(select(length > 0))')
 
   terraform-validate:
     name: Validate ${{ matrix.module }}
