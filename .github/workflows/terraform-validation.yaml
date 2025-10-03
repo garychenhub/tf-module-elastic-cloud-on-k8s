@@ -3,8 +3,8 @@ name: Terraform Validation (Smart)
 on:
   pull_request:
     branches:
-      - main
-      - develop
+      - "master"
+      - "feature/*"
     paths:
       - "**.tf"
       - "**.tfvars"
@@ -37,20 +37,15 @@ jobs:
       - name: Find changed Terraform modules
         id: find-modules
         run: |
-          # If PR, compare PR base branch with head branch
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            BASE_REF="${{ github.event.pull_request.base.sha }}"
-            HEAD_REF="${{ github.event.pull_request.head.sha }}"
-          else
-            # If push, compare with previous commit
-            BASE_REF="${{ github.event.before }}"
-            HEAD_REF="${{ github.sha }}"
-          fi
-          
-          echo "Comparing $BASE_REF...$HEAD_REF"
-          
-          # Find all changed .tf files
-          CHANGED_FILES=$(git diff --name-only $BASE_REF $HEAD_REF | grep '\.tf
+          # Find all directories containing main.tf or versions.tf
+          # Exclude .terraform, .git, and examples directories
+          modules=$(find . -type f \( -name "main.tf" -o -name "versions.tf" \) \
+            -not -path "*/.terraform/*" \
+            -not -path "*/.git/*" \
+            -not -path "*/examples/*" | \
+            xargs -I {} dirname {} | \
+            sort -u | \
+            jq -R -s -c 'split("\n") | map(select(length > 0))')
 
   terraform-validate:
     name: Validate ${{ matrix.module }}
