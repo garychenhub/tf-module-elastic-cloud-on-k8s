@@ -5,6 +5,8 @@ on:
     branches:
       - "feature/*"
       - "main"
+    paths:
+      - "docker/**"
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
